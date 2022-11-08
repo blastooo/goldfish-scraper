@@ -65,7 +65,7 @@ const scrapeIt = async () => {
 
   const testSearchUrl = 'https://app.iclasspro.com/portal/gssshoreline/classes?days=1';
   const searchUrl = 'https://app.iclasspro.com/portal/gssshoreline/classes?levels=11&days=1,7&openings=1';
-  await page.goto(testSearchUrl);
+  await page.goto(searchUrl);
 
   await page.waitForTimeout(5000);
 
@@ -74,26 +74,40 @@ const scrapeIt = async () => {
   const exists = await page.$eval(noClassesFoundSelector, () => true).catch(() => false);
 
   if (exists) {
-    console.log("No classes found");
+    console.log('No classes found');
     await browser.close();
     return;
   }
 
-  console.log("Classes found");
+  console.log('Classes found');
 
   const classesFoundSelector = 'body > customer-portal-layout > customer-portal-classes > div > div > div.main.notification-layout.kiosk > div > div > div.inner-wrap-body > div > div:nth-child(1) > span';
   await page.waitForSelector(classesFoundSelector);
 
-  const firstArticle = await page.$('article:first-of-type');
+  const openings = await page.$$('article');
+
   const getText = (parent, selector) => {
     return parent.$eval(selector, el => el.innerText);
   };
 
-  const header = await getText(firstArticle, 'h2');
-  console.log(`${header}`);
+  let classes = [];
+  
+  for (const opening of openings) {
+    try {
+      const header = await opening.$eval('.vacancy-text > span > span > span', el => el.innerText);
+    } catch (exception) {
+      const header = await getText(opening, 'h2');
+      classes.push(header);
+    }
+  }
 
-  sendSMS(`${header}`, toNumber);
-
+  if (classes.length > 0) {
+    console.log('Openings found');
+    sendSMS(`${classes}`, toNumber);
+  } else {
+    console.log('No openings found');
+  }
+  
   await browser.close();
 }
 
