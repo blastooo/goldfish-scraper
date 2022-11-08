@@ -26,7 +26,7 @@ const sendSMS = function(msg) {
 };
 
 // build job
-(async () => {
+const scrapeIt = async () => {
 
   const browser = await puppeteer.launch({
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--single-process', '--no-zygote']
@@ -37,31 +37,31 @@ const sendSMS = function(msg) {
 
   await page.goto(loginUrl);
 
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(1000);
 
   const currentCustomerSelector = 'body > customer-portal-layout > customer-portal-login > div > div > div.body.notification-layout.kiosk > div > div > div > div.registration-wrap.vertical-center.scrollbar-light.scrollbar-custom > div > div > div > div > div > div.row.row-matrix.animate-iterate.animate-iterate-delay-between-long.animate-duration-medium.animate-delay-short > div:nth-child(1) > button';
   await page.waitForSelector(currentCustomerSelector);
   await page.click(currentCustomerSelector);
 
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(1000);
 
   const loginSelector = 'body > customer-portal-layout > customer-portal-login > div > div > div.body.notification-layout.kiosk > div > div > div > div.registration-wrap.vertical-center.scrollbar-light.scrollbar-custom > div > div > div > div > div > div:nth-child(2) > div > form > div > div:nth-child(1) > div > input';
   await page.waitForSelector(loginSelector);
   await page.type(loginSelector, login);
 
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(1000);
 
   const pwSelector = 'body > customer-portal-layout > customer-portal-login > div > div > div.body.notification-layout.kiosk > div > div > div > div.registration-wrap.vertical-center.scrollbar-light.scrollbar-custom > div > div > div > div > div > div:nth-child(2) > div > form > div > div:nth-child(2) > div > input';
   await page.waitForSelector(pwSelector);
   await page.type(pwSelector, pw);
 
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(1000);
 
   const nextSelector = '#nav-btn-next';
   await page.waitForSelector(nextSelector);
   await page.click(nextSelector);
 
-  await page.waitForTimeout(2000);
+  await page.waitForTimeout(1000);
 
   const testSearchUrl = 'https://app.iclasspro.com/portal/gssshoreline/classes?days=1';
   const searchUrl = 'https://app.iclasspro.com/portal/gssshoreline/classes?levels=11&days=1,7&openings=1';
@@ -84,8 +84,6 @@ const sendSMS = function(msg) {
   const classesFoundSelector = 'body > customer-portal-layout > customer-portal-classes > div > div > div.main.notification-layout.kiosk > div > div > div.inner-wrap-body > div > div:nth-child(1) > span';
   await page.waitForSelector(classesFoundSelector);
 
-  await page.waitForTimeout(2000);
-
   const firstArticle = await page.$('article:first-of-type');
   const getText = (parent, selector) => {
     return parent.$eval(selector, el => el.innerText);
@@ -97,4 +95,6 @@ const sendSMS = function(msg) {
   sendSMS(`${header}`, toNumber);
 
   await browser.close();
-})();
+}
+
+scrapeIt();
